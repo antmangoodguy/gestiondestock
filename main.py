@@ -20,16 +20,28 @@ def verif_saisie_paquet(saisie):
   sont valides, sinon une liste vide."""
   paquet = saisie.split(" ")
   produits_valide = []
-  for curseur in range(len(paquet)):
-    if len(paquet[curseur]) != 2:
+  for valeur in paquet:
+    if len(valeur) != 2:
       print("Saisie invalide")
       return []
-    element = verif_saisie_produit(paquet[curseur])
+    element = verif_saisie_produit(valeur)
     if element == "":
       print("Saisie invalide")
       return []
     produits_valide.append(element)
   return produits_valide
+
+
+def afficher_sortie_colis(colis, paquet):
+  """Affiche le résultat de la sortie d'un paquet de produits."""
+  if colis:
+    print("Colis de sortie : ")
+    for produit in colis:
+      print(f"[{produit}]")
+    if paquet != []:
+      print(f'Les produits {paquet} n\'étaient pas dans le stock')
+  else:
+    print(f'Aucun des produits {paquet} ne sont dans le stock')
 
 
 class Entrepot:
@@ -69,8 +81,8 @@ class Entrepot:
     if self.est_vide():
       return ""
     string = "<- "
-    for indice, element in enumerate(self.stock):
-      string += f"{element} "
+    for element in self.stock:
+      string += f"{element}"
     string += "<-"
     return string
 
@@ -135,10 +147,9 @@ class Entrepot:
     if not self.alertes:
       print("Aucune alerte")
     else:
-      for alerte in self.alertes:
+      for alerte, nombre_restant in self.alertes.items():
         print(
-            f"Alerte: {alerte} en rupture de stock. ({self.alertes[alerte]} restant)"
-        )
+            f"Alerte: {alerte} en rupture de stock. {nombre_restant} restant)")
 
   def sortie_de_produit(self, paquet):
     """Compare deux listes (Dans ce context ici ce sera le stock de l'entrepôt et 
@@ -157,7 +168,7 @@ class Entrepot:
     """Effectue la sortie d'un paquet de produits du stock (en utilisant
     sortie_de_produit), puis empile cette sortie dans un colis, du plus grand volume au 
     plus petit."""
-    sortie = self.sortie_de_produit(self.stock, paquet)
+    sortie = self.sortie_de_produit(paquet)
     colis = []
 
     if sortie:
@@ -170,24 +181,6 @@ class Entrepot:
         sortie.remove(max_value)
     return colis
 
-  def afficher_sortie_produit(self, colis, produit_saisi):
-    """Affiche le résultat de la sortie d'un produit."""
-    if colis:
-      print(f"Colis de sortie : {colis}")
-    else:
-      print(f'L\'élement {produit_saisi} n\'est pas dans le stock')
-
-  def afficher_sortie_paquet(self, colis, paquet):
-    """Affiche le résultat de la sortie d'un paquet de produits."""
-    if colis:
-      print("Colis de sortie : ")
-      for produit in colis:
-        print(f"[{produit}]")
-      if paquet != []:
-        print(f'Les produits {paquet} n\'étaient pas dans le stock')
-    else:
-      print(f'Aucun des produits {paquet} ne sont dans le stock')
-
   def sortir_produit_ou_paquet(self):
     """Effectue la sortie de l'entrepôt d'un produit ou d'un paquet de produits en
     fonction de la saisie de l'utilisateur."""
@@ -197,12 +190,12 @@ class Entrepot:
         produit = verif_saisie_produit(saisie)
         if produit != "":
           colis = self.sortie_de_produit([produit])
-          self.afficher_sortie_produit(colis, produit)
+          afficher_sortie_colis(colis, [produit])
       else:
         paquet = verif_saisie_paquet(saisie)
         if paquet != []:
           colis = self.sortie_en_colis_paquet(paquet)
-          self.afficher_sortie_paquet(colis, paquet)
+          afficher_sortie_colis(colis, paquet)
 
 
 def afficher_menu():
@@ -241,9 +234,8 @@ def selection_choix():
   if choix == "5":
     print("Programme terminé.")
     return 1
-  else:
-    print("Option invalide. Veuillez choisir une option valide.")
-    return 0
+  print("Option invalide. Veuillez choisir une option valide.")
+  return 0
 
 
 #Instanciation d'un objet Entrepot
