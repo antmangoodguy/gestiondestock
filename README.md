@@ -1,0 +1,2 @@
+# gestiondestock
+python
